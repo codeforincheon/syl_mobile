@@ -2,3 +2,11 @@ github "Alamofire/Alamofire" ~> 3.0
 github "SwiftyJSON/SwiftyJSON"
 github "ParsePlatform/Parse-SDK-iOS-OSX"
 github "xmartlabs/Eureka" ~> 1.5
+github "DaveWoodCom/XCGLogger" ~> 3.3
+github "kciter/KCFloatingActionButton"
+github "hyperoslo/ImagePicker"
+github "vikmeup/SCLAlertView-Swift"
+github "gavinbunney/Toucan"
+github "onevcat/Kingfisher" ~> 2.2
+github "malcommac/SwiftDate"
+github "raulriera/TextFieldEffects" ~> 1.1.1
