@@ -143,7 +143,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             destController.article = self.article[sender!.row]
             let query = PFQuery(className: "comment")
             query.whereKey("article", equalTo: self.article[sender!.row])
-            query.orderByDescending("createdAt")
+            query.orderByAscending("createdAt")
             query.findObjectsInBackgroundWithBlock{
                 (objects: [PFObject]?, error: NSError?) -> Void in
                 if let error = error{
@@ -155,6 +155,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     destController.tableView.reloadSections(section, withRowAnimation: .Automatic)
                 }
             }
+            destController.category = self.article[sender!.row]["category"] as! String
         }
         
         if segue.identifier == "FromMainToAlarm"{ //메인 -> 알람 segue
@@ -226,10 +227,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         cell.commentBtn.addTarget(self, action: #selector(self.commentAction(_:)), forControlEvents: .TouchUpInside)
         cell.shareBtn.addTarget(self, action: #selector(self.shareAction(_:)), forControlEvents: .TouchUpInside)
         
-        
-        
-        
-        
         switch article[indexPath.row]["category"] as! String {
         case "medical":
             cell.foregroundImage.image = UIImage(named: "medical_icon")
@@ -258,15 +255,16 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         //열려있으면 접기
         if(collapsibleConstraint.constant == 215)
         {
-            
             UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
                 self.myLocationBtn.alpha = 0
                 //self.myLocationBtnConstraint.constant = 0
                 self.floatBtnConstraint.active = false
                 //self.MapView.alpha = 0
                 self.MapView.alpha = 1
-                self.collapsibleConstraint.constant = 0
-                self.collapseBtnConstraint.constant = 68 //탑과 버튼사이
+                
+                print(self.collapseBtnConstraint.constant)
+                self.collapsibleConstraint.constant = 8
+                self.collapseBtnConstraint.constant = 69 //탑과 버튼사이
                 self.collapseBtn.hidden = true
                 //self.collapseBtn.transform = CGAffineTransformMakeRotation(CGFloat(M_PI))
                 self.view.layoutIfNeeded()}, completion: {
@@ -281,10 +279,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
             
         //닫혀있으면 열기
-        else if(collapsibleConstraint.constant == 0){
+        else if(collapsibleConstraint.constant == 8){
             UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
                 self.floatBtnConstraint.active = true
-                self.myLocationBtnConstraint.constant = 40
                 self.myLocationBtn.alpha = 1
                 self.MapView.alpha = 1
                 self.collapsibleConstraint.constant = 215
@@ -445,6 +442,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                         point.title = String(i)
                         point.subtitle = "Welcome to my marker"
                         
+                        
                         self.markers.append(point)
                         self.map?.addAnnotation(point)
                     }
@@ -484,6 +482,44 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
         }
     }
+    func mapView(mapView: MGLMapView, imageForAnnotation annotation: MGLAnnotation) -> MGLAnnotationImage? {
+        // Try to reuse the existing ‘pisa’ annotation image, if it exists
+        var annotationImage = mapView.dequeueReusableAnnotationImageWithIdentifier("point")
+        if annotationImage == nil {
+            // Leaning Tower of Pisa by Stefan Spieler from the Noun Project
+            var image:UIImage!
+            print(annotation.title)
+            image = Toucan(image: UIImage(named: "bin_marker")!).resize(CGSize(width: 30, height: 30)).image
+            image = image.imageWithAlignmentRectInsets(UIEdgeInsetsMake(0, 0, image.size.height/2, 0))
+            // Initialize the ‘pisa’ annotation image with the UIImage we just loaded
+            annotationImage = MGLAnnotationImage(image: image, reuseIdentifier: "pin")
+        }
+        return annotationImage
+    }
+    
+    /*
+    func mapView(mapView: MGLMapView, imageForAnnotation annotation: MGLAnnotation) -> MGLAnnotationImage? {
+        // Try to reuse the existing ‘pisa’ annotation image, if it exists
+        var annotationImage = mapView.dequeueReusableAnnotationImageWithIdentifier("point")
+        if annotationImage == nil {
+            // Leaning Tower of Pisa by Stefan Spieler from the Noun Project
+            var image:UIImage!
+            
+            image = Toucan(image: UIImage(named: "bin_marker")!).resize(CGSize(width: 30, height: 30)).image
+            image = image.imageWithAlignmentRectInsets(UIEdgeInsetsMake(0, 0, image.size.height/2, 0))
+            // Initialize the ‘pisa’ annotation image with the UIImage we just loaded
+            annotationImage = MGLAnnotationImage(image: image, reuseIdentifier: "pin")
+            }
+        return annotationImage
+    }
+            */
+        
+
+    
+    
+    
+    
+ 
     
     
     

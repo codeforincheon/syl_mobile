@@ -10,13 +10,17 @@ import UIKit
 import Parse
 import Mapbox
 import SwiftDate
+import Toucan
 
-class DetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextViewDelegate {
+class DetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextViewDelegate, MGLMapViewDelegate{
     
     @IBOutlet var nameOfArticle: UILabel!
     @IBOutlet var tableView: UITableView!
     var article:PFObject!
     var comments:[PFObject!] = []
+    var category:String!
+    var postId:String!
+    var authorNick:String!
     
     override func viewDidLoad() {
         
@@ -27,6 +31,24 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         self.hideKeyboardWhenTappedAround()
         self.viewUpByKeyboard()
         tableView.tableFooterView = UIView()
+        
+        let nowPost = self.article
+        nowPost.fetchIfNeededInBackgroundWithBlock {
+            (post: PFObject?, error: NSError?) -> Void in
+            self.postId = post?.objectId!
+            print("\(self.postId)포스트 아이디")
+        }
+        
+        let nowUser = PFUser.currentUser()! as PFUser
+        nowUser.fetchIfNeededInBackgroundWithBlock {
+            (user: PFObject?, error: NSError?) -> Void in
+            print(user)
+            if let nickname = user?["nickname"]{
+                self.authorNick = nickname as! String
+                print("\(self.authorNick)유져 아이디")
+            }
+        }
+        
         
         
         let indexPath = NSIndexPath(forItem: 0, inSection: 0)
@@ -69,6 +91,26 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             let cell = tableView.dequeueReusableCellWithIdentifier("DetailSecondCell", forIndexPath: indexPath) as! DetailSecondCell
             //print("댓글 쓰기 불려짐")
             cell.article = article
+            cell.authorNick = self.authorNick
+            cell.postId = self.postId
+            /*
+            let nowPost = article
+            nowPost.fetchIfNeededInBackgroundWithBlock {
+                (post: PFObject?, error: NSError?) -> Void in
+                cell.postId = post?.objectId!
+                print(cell.postId)
+            }
+            
+            let nowUser = PFUser.currentUser()! as PFUser
+            nowUser.fetchIfNeededInBackgroundWithBlock {
+                (user: PFObject?, error: NSError?) -> Void in
+                if let nickname = user?["nickName"]{
+                    cell.authorNick = nickname as! String
+                    print(cell.authorNick)
+                }
+            }
+            */
+            
             return cell
         case 2: //3번째
             let cell = tableView.dequeueReusableCellWithIdentifier("DetailThirdCell", forIndexPath: indexPath) as! DetailThirdCell
@@ -113,6 +155,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             cell.shareCount.text = String(article["shareCount"] as! Int)
             cell.commentCount.text = String(article["commentCount"] as! Int)
             cell.userTime.text = String(stringDate + "전")
+            cell.mapView.delegate = self
             if let locationString = article["locationString"]{
                 cell.userAddress.text = locationString as? String
             }
@@ -157,17 +200,32 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
                 if let nowPhoto = user?["userPhoto"]{
                     let unwrapPhoto = nowPhoto as! PFFile
                     print(unwrapPhoto.url)
-                    cell.userImage.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!)
+                    //cell.userImage.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!)
                     
                 }
                 else{
                     //cell.userImage.image = UIImage(named: "default-uesr")
-                    cell.userImage.image = UIImage(named: "default-user2")
+                    //cell.userImage.image = UIImage(named: "default-user2")
                     print("글쓴이 이미자가 없어서 넣어줬음")
                 }
                 if let userName = user?["nickname"]{
                     cell.userName.text = userName as? String
                     self.nameOfArticle.text = userName as! String + " 님의 글"
+                }
+                
+                switch self.category {
+                case "medical":
+                cell.userImage.image = UIImage(named: "medical_icon")
+                case "missing":
+                cell.userImage.image = UIImage(named: "missing_icon")
+                case "help":
+                cell.userImage.image = UIImage(named: "help_icon")
+                case "supply":
+                cell.userImage.image = UIImage(named: "supply_icon")
+                case "other":
+                cell.userImage.image = UIImage(named: "other_icon")
+                default:
+                cell.userImage.image = UIImage(named: "other_icon")
                 }
             }
             //print("메인부분 불려짐")
@@ -183,5 +241,58 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         let firstSection = self.tableView.cellForRowAtIndexPath(firstIndexPath)
         print(firstSection)
     }
+    
+    func mapView(mapView: MGLMapView, imageForAnnotation annotation: MGLAnnotation) -> MGLAnnotationImage? {
+        // Try to reuse the existing ‘pisa’ annotation image, if it exists
+        var annotationImage = mapView.dequeueReusableAnnotationImageWithIdentifier("pin")
+        
+        let thisCategory = self.category
+        
+        print(thisCategory)
+        
+        if annotationImage == nil {
+            // Leaning Tower of Pisa by Stefan Spieler from the Noun Project
+            var image:UIImage!
+            
+            switch self.category {
+            case "missing":
+                print("missing marker")
+                image = Toucan(image: UIImage(named: "missing_marker")!).resize(CGSize(width: 30, height: 30)).image
+            case "supply":
+                print("supply marker")
+                image = Toucan(image: UIImage(named: "supply_marker")!).resize(CGSize(width: 30, height: 30)).image
+            case "help":
+                print("help marker")
+                image = Toucan(image: UIImage(named: "help_marker")!).resize(CGSize(width: 30, height: 30)).image
+            case "medical":
+                print("medical marker")
+                image = Toucan(image: UIImage(named: "medical_marker")!).resize(CGSize(width: 30, height: 30)).image
+            case "other":
+                print("other marker")
+                image = Toucan(image: UIImage(named: "other_marker")!).resize(CGSize(width: 30, height: 30)).image
+            default:
+                print("default marker")
+                image = Toucan(image: UIImage(named: "other_marker")!).resize(CGSize(width: 30, height: 30)).image
+            }
+            // The anchor point of an annotation is currently always the center. To
+            // shift the anchor point to the bottom of the annotation, the image
+            // asset includes transparent bottom padding equal to the original image
+            // height.
+            //
+            // To make this padding non-interactive, we create another image object
+            // with a custom alignment rect that excludes the padding.
+            image = image.imageWithAlignmentRectInsets(UIEdgeInsetsMake(0, 0, image.size.height/2, 0))
+            
+            // Initialize the ‘pisa’ annotation image with the UIImage we just loaded
+            annotationImage = MGLAnnotationImage(image: image, reuseIdentifier: "pin")
+        }
+        
+        return annotationImage
+    }
+ 
+    
+
+    
+    
     
 }

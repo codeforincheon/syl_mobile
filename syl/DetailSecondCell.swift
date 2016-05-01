@@ -14,11 +14,17 @@ class DetailSecondCell: UITableViewCell {
     @IBOutlet var commentField: UITextField!
     @IBOutlet var commentBtn: UIButton!
     var article:PFObject!
+    var postId:String!
+    var authorNick:String!
     
     @IBAction func commentAction(sender: AnyObject) {
         let commentObject = PFObject(className: "comment")
         commentObject["comment"] = self.commentField.text
         commentObject["user"] = PFUser.currentUser()
+        commentObject["authorId"] = PFUser.currentUser()?.objectId!
+        commentObject["authorNick"] = self.authorNick
+        commentObject["postId"] = self.postId
+        
         commentObject["article"] = self.article
         commentObject.saveInBackgroundWithBlock{
             (success: Bool, error: NSError?) -> Void in
@@ -49,7 +55,7 @@ class DetailSecondCell: UITableViewCell {
                             //코멘트 등록
                             query = PFQuery(className: "comment")
                             query.whereKey("article", equalTo: self.article)
-                            query.orderByDescending("createdAt")
+                            query.orderByAscending("createdAt")
                             query.findObjectsInBackgroundWithBlock{
                                 (objects: [PFObject]?, error: NSError?) -> Void in
                                 viewController.comments = objects!
@@ -83,15 +89,6 @@ class DetailSecondCell: UITableViewCell {
                         }
                     }
                 }
-                
-                
-                
-                
-                
-                
-                
-                
-                
             }
             else{
                 SCLAlertView().showError("Comment Error", subTitle: "코멘트 에러발생")
@@ -117,7 +114,7 @@ class DetailSecondCell: UITableViewCell {
             let numberOfRows = superTableView.numberOfRowsInSection(numberOfSections-1)
             
             if numberOfRows > 0 {
-                let indexPath = NSIndexPath(forRow: 0, inSection: (numberOfSections-1))
+                let indexPath = NSIndexPath(forRow: (numberOfRows-1), inSection: (numberOfSections-1))
                 superTableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: UITableViewScrollPosition.Bottom, animated: animated)
             }
             
