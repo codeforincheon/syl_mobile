@@ -32,6 +32,12 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         self.viewUpByKeyboard()
         tableView.tableFooterView = UIView()
         
+        
+
+        
+        //self.tableView.separatorStyle = UITableViewCellSeparatorStyle.
+        
+        
         let nowPost = self.article
         nowPost.fetchIfNeededInBackgroundWithBlock {
             (post: PFObject?, error: NSError?) -> Void in
@@ -111,6 +117,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             }
             */
             
+            
             return cell
         case 2: //3번째
             let cell = tableView.dequeueReusableCellWithIdentifier("DetailThirdCell", forIndexPath: indexPath) as! DetailThirdCell
@@ -137,6 +144,9 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             let stringDate = (comments[indexPath.row].createdAt!).toNaturalString(NSDate(), inRegion: .None, style: FormatterStyle(style: .Abbreviated, max: 1))!
             
             cell.time.text = stringDate + "전"
+            
+            
+            
             
             //print("코멘트 불려짐")
             return cell

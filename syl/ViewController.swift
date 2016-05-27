@@ -489,7 +489,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             // Leaning Tower of Pisa by Stefan Spieler from the Noun Project
             var image:UIImage!
             print(annotation.title)
-            image = Toucan(image: UIImage(named: "bin_marker")!).resize(CGSize(width: 30, height: 30)).image
+            image = Toucan(image: UIImage(named: "bin_marker")!).resize(CGSize(width: 20, height: 20)).image
             image = image.imageWithAlignmentRectInsets(UIEdgeInsetsMake(0, 0, image.size.height/2, 0))
             // Initialize the ‘pisa’ annotation image with the UIImage we just loaded
             annotationImage = MGLAnnotationImage(image: image, reuseIdentifier: "pin")
