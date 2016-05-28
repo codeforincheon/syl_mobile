@@ -42,9 +42,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBOutlet var floatBtnConstraint: NSLayoutConstraint!
     @IBOutlet var floatBtnConstraintBottom: NSLayoutConstraint!
     
-    //KFloat Button
-    let kCloseCellHeight: CGFloat = 205
-    let kOpenCellHeight: CGFloat = 479
+    //KFloat Button 맵, 아티클, 뱃지, 마커
     var map:MGLMapView!
     var article:[PFObject]!
     var badgeNum:Int!
@@ -55,16 +53,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         //테이블 뷰 예상높이, 동적 디멘션
         tableView.estimatedRowHeight = 238
         tableView.rowHeight = UITableViewAutomaticDimension
+        //테이블뷰 배경색
         self.tableView.backgroundColor = UIColor(red: 44/255, green: 43/255, blue: 43/255, alpha: 1)
         
         //mapbox
         map = MGLMapView(frame: self.MapView.bounds,
                              styleURL: MGLStyle.lightStyleURL())
         map.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        //set the map's center coordinate
-        /*map!.setCenterCoordinate(CLLocationCoordinate2D(latitude: 40.7326808,
-            longitude: -73.9843407),zoomLevel: 12, animated: false)
-        */
         map.attributionButton.hidden = true
         self.MapView.addSubview(map)
         map.delegate = self
@@ -141,6 +136,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         if segue.identifier == "FromMainToDetail"{ //메인 -> 디테일 segue
             let destController = segue.destinationViewController as! DetailViewController
             destController.article = self.article[sender!.row]
+            print(self.article[sender!.row]["authorNick"])
+            
+            
+            destController.nameArticle = (self.article[sender!.row]["authorNick"] as? String)! + "님의 글"
+            destController.name = self.article[sender!.row]["authorNick"] as? String
+
+            
             let query = PFQuery(className: "comment")
             query.whereKey("article", equalTo: self.article[sender!.row])
             query.orderByAscending("createdAt")
@@ -171,6 +173,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 else{
                     print("알람 가져왔다 \(objects)")
                     destController.alarms = objects!
+                    
                     let section = NSIndexSet(index: 0)
                     destController.tableView.reloadSections(section, withRowAnimation: .Automatic)
                 }
@@ -203,15 +206,20 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         //간단한 날짜(ex 1분전, 12시간전, 3일전)
         let stringDate = (article[indexPath.row].createdAt!).toNaturalString(NSDate(), inRegion: .None, style: FormatterStyle(style: .Abbreviated, max: 1))!
         
-        //유져 닉네임 꺼내오기
-        let thisUser = article[indexPath.row]["user"] as! PFUser
-        thisUser.fetchIfNeededInBackgroundWithBlock {
-            (user: PFObject?, error: NSError?) -> Void in
-            if let userName = user?["nickname"]{
-                cell.foregroundName.text = userName as? String
+        //실제 닉네임 꺼내오기
+        /*
+        dispatch_async(dispatch_get_main_queue(), {
+            let thisUser = self.article[indexPath.row]["user"] as! PFUser
+            thisUser.fetchIfNeededInBackgroundWithBlock {
+                (user: PFObject?, error: NSError?) -> Void in
+                if let userName = user?["nickname"]{
+                    cell.foregroundName.text = userName as? String
+                }
             }
-        }
-        
+            //cell.foregroundName.text = String(indexPath.row)
+        })
+        */
+        cell.foregroundName.text = article[indexPath.row]["authorNick"] as? String
         cell.backgroundColor = UIColor(red: 44/255, green: 43/255, blue: 43/255, alpha: 1)
         cell.foregroundContent.delegate = self
         cell.foregroundContent.text = article[indexPath.row]["content"] as! String
@@ -412,6 +420,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func reloadData(){
+        
+        //table 초기화
+        self.article = []
+        self.tableView.dataSource = self
+        self.tableView.delegate = self
+        self.tableView.reloadData()
+        
         var query = PFQuery(className: "article")
         query.orderByDescending("createdAt")
         query.findObjectsInBackgroundWithBlock{
@@ -421,12 +436,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
             else{
                 print("정보 가져옴")
+                
                 self.article = objects!
                 self.tableView.dataSource = self
                 self.tableView.delegate = self
                 self.tableView.reloadData()
-                let firstIdx = NSIndexSet(index: 0)
-                self.tableView.reloadSections(firstIdx, withRowAnimation: .Automatic)
+                //let firstIdx = NSIndexSet(index: 0)
+                //self.tableView.reloadSections(firstIdx, withRowAnimation: .Automatic)
                 self.tableView.tableFooterView = UIView()
                 //애닌메이션 없음
                 //self.tableView.reloadData()
@@ -441,7 +457,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                         //point.performSelector(#selector(self.moveToDetail(_:)))
                         point.title = String(i)
                         point.subtitle = "Welcome to my marker"
-                        
                         
                         self.markers.append(point)
                         self.map?.addAnnotation(point)

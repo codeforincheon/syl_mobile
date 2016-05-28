@@ -21,6 +21,8 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
     var category:String!
     var postId:String!
     var authorNick:String!
+    var nameArticle: String?
+    var name: String?
     
     override func viewDidLoad() {
         
@@ -32,12 +34,6 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         self.viewUpByKeyboard()
         tableView.tableFooterView = UIView()
         
-        
-
-        
-        //self.tableView.separatorStyle = UITableViewCellSeparatorStyle.
-        
-        
         let nowPost = self.article
         nowPost.fetchIfNeededInBackgroundWithBlock {
             (post: PFObject?, error: NSError?) -> Void in
@@ -45,6 +41,10 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             print("\(self.postId)포스트 아이디")
         }
         
+        self.nameOfArticle.text = self.nameArticle
+        
+        
+        /* 실제 아이디
         let nowUser = PFUser.currentUser()! as PFUser
         nowUser.fetchIfNeededInBackgroundWithBlock {
             (user: PFObject?, error: NSError?) -> Void in
@@ -54,6 +54,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
                 print("\(self.authorNick)유져 아이디")
             }
         }
+        */
         
         
         
@@ -97,8 +98,13 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             let cell = tableView.dequeueReusableCellWithIdentifier("DetailSecondCell", forIndexPath: indexPath) as! DetailSecondCell
             //print("댓글 쓰기 불려짐")
             cell.article = article
-            cell.authorNick = self.authorNick
+            //print(article)
+            //cell.authorNick = article[""]
+            cell.authorNick = article["authorNick"] as? String
             cell.postId = self.postId
+            cell.separatorInset = UIEdgeInsetsMake(0.0, 10000, 0.0, cell.bounds.size.width)
+            cell.authorNick = self.name
+            
             /*
             let nowPost = article
             nowPost.fetchIfNeededInBackgroundWithBlock {
@@ -126,20 +132,25 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             // print("코멘트 불려짐")
             
             let nowUser = comments[indexPath.row]["user"] as! PFObject
-            nowUser.fetchIfNeededInBackgroundWithBlock {
-                (user: PFObject?, error: NSError?) -> Void in
-                if let nowPhoto = user?["userPhoto"]{
-                    let unwrapPhoto = nowPhoto as! PFFile
-                    cell.userImage.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!)
+            
+            print(nowUser)
+            dispatch_async(dispatch_get_main_queue(), {
+                nowUser.fetchIfNeededInBackgroundWithBlock {
+                    (user: PFObject?, error: NSError?) -> Void in
+                    if let nowPhoto = user?["userPhoto"]{
+                        let unwrapPhoto = nowPhoto as! PFFile
+                        cell.userImage.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!, placeholderImage: nil)
+                    }
+                    else{
+                        cell.userImage.image = UIImage(named: "default-user2")
+                    }
+                    if let userName = user?["nickname"]{
+                        cell.userName.text = userName as? String
+                        
+                    }
                 }
-                else{
-                    cell.userImage.image = UIImage(named: "default-user2")
-                }
-                if let userName = user?["nickname"]{
-                    cell.userName.text = userName as? String
-                    
-                }
-            }
+            })
+            
             
             let stringDate = (comments[indexPath.row].createdAt!).toNaturalString(NSDate(), inRegion: .None, style: FormatterStyle(style: .Abbreviated, max: 1))!
             
@@ -161,6 +172,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         
             
             let stringDate = (article.createdAt!).toNaturalString(NSDate(), inRegion: .None, style: FormatterStyle(style: .Abbreviated, max: 1))!
+            cell.userName.text = self.name
             cell.textView.text = article["content"] as! String
             cell.shareCount.text = String(article["shareCount"] as! Int)
             cell.commentCount.text = String(article["commentCount"] as! Int)
@@ -179,6 +191,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             cell.mapView.setCenterCoordinate(center, zoomLevel: 12, animated: false)
             cell.mapView.attributionButton.hidden = true
             cell.mapView.styleURL = MGLStyle.lightStyleURL()
+            cell.separatorInset = UIEdgeInsetsMake(0.0, 10000, 0.0, cell.bounds.size.width)
             //cell.selectionStyle = .None
             
             
@@ -198,7 +211,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
                     //print("이미지셋")
                 })
             }else{
-                cell.imageConstraint.active = false
+                //cell.imageConstraint.active = false
                 cell.userPhoto.hidden = true
                 //print("hidden")
             }
@@ -209,7 +222,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
                 (user: PFObject?, error: NSError?) -> Void in
                 if let nowPhoto = user?["userPhoto"]{
                     let unwrapPhoto = nowPhoto as! PFFile
-                    print(unwrapPhoto.url)
+                    //print(unwrapPhoto.url)
                     //cell.userImage.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!)
                     
                 }
@@ -218,10 +231,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
                     //cell.userImage.image = UIImage(named: "default-user2")
                     print("글쓴이 이미자가 없어서 넣어줬음")
                 }
-                if let userName = user?["nickname"]{
-                    cell.userName.text = userName as? String
-                    self.nameOfArticle.text = userName as! String + " 님의 글"
-                }
+                
                 
                 switch self.category {
                 case "medical":
@@ -249,7 +259,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
     @IBAction func test(sender: AnyObject) {
         let firstIndexPath = NSIndexPath(forItem: 0, inSection: 0)
         let firstSection = self.tableView.cellForRowAtIndexPath(firstIndexPath)
-        print(firstSection)
+        //print(firstSection)
     }
     
     func mapView(mapView: MGLMapView, imageForAnnotation annotation: MGLAnnotation) -> MGLAnnotationImage? {
@@ -258,7 +268,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         
         let thisCategory = self.category
         
-        print(thisCategory)
+        //print(thisCategory)
         
         if annotationImage == nil {
             // Leaning Tower of Pisa by Stefan Spieler from the Noun Project
