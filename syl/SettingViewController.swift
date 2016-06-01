@@ -69,6 +69,7 @@ class SettingViewController: UIViewController, ImagePickerDelegate {
             self.imageSelect.alpha = 0
             self.userPhoto.alpha = 0
             self.userNickname.alpha = 0
+            self.userPassword.alpha = 0
             self.editBtn.alpha = 0
             self.progressBar.alpha = 1
             }, completion: nil)

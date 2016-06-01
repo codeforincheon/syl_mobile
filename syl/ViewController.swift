@@ -398,7 +398,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             print("취소")
         }
         alertView.showCloseButton = false
-        alertView.showEdit("123", subTitle: "123")
+        alertView.showEdit("공유하기", subTitle: "공유하시겠습니까?")
     }
     
     func mapView(mapView: MGLMapView, tapOnCalloutForAnnotation annotation: MGLAnnotation) {
