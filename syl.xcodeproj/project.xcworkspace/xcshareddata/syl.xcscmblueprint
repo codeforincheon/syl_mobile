@@ -7,7 +7,7 @@
     "7B1AABCF58C22C7F42D2D503F63D9863520E3B70" : 0,
     "3FBAE916E57668EA9EA60A8CE17AAF532888BB32" : 0
   },
-  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B448E790-F0F4-499B-A297-4ECC551C9F85",
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "750A2211-BE4A-4800-AB2E-A0BEFEBD38A2",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "7B1AABCF58C22C7F42D2D503F63D9863520E3B70" : "syl\/",
     "3FBAE916E57668EA9EA60A8CE17AAF532888BB32" : "syl\/syl\/"
@@ -17,7 +17,7 @@
   "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "syl.xcodeproj",
   "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
     {
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/codeforincheon\/syl_mobile.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/yoohoogun114\/SYL",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3FBAE916E57668EA9EA60A8CE17AAF532888BB32"
     },

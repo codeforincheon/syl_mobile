@@ -21,6 +21,8 @@ class SettingViewController: UIViewController, ImagePickerDelegate {
     @IBOutlet var userPassword: UITextField!
     @IBOutlet var userNickname: UITextField!
     
+    @IBOutlet weak var userLine: UIView!
+    @IBOutlet weak var pwLine: UIView!
     
     
     var userSelectImages: [UIImage]?
@@ -71,6 +73,8 @@ class SettingViewController: UIViewController, ImagePickerDelegate {
             self.userNickname.alpha = 0
             self.userPassword.alpha = 0
             self.editBtn.alpha = 0
+            self.userLine.alpha = 0
+            self.pwLine.alpha = 0
             self.progressBar.alpha = 1
             }, completion: nil)
         

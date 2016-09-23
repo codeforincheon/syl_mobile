@@ -14,6 +14,7 @@ import Toucan
 
 class DetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextViewDelegate, MGLMapViewDelegate{
     
+    @IBOutlet weak var deleteBtn: UIButton!
     @IBOutlet var nameOfArticle: UILabel!
     @IBOutlet var tableView: UITableView!
     var article:PFObject!
@@ -23,6 +24,8 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
     var authorNick:String!
     var nameArticle: String?
     var name: String?
+    var myName: String?
+    @IBOutlet weak var actibityIndc: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         
@@ -57,10 +60,10 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         */
         
         
-        
-        let indexPath = NSIndexPath(forItem: 0, inSection: 0)
-        let firstCell = self.tableView.cellForRowAtIndexPath(indexPath) as! DetailFirstCell
-        firstCell.textView.delegate = self
+        //여기 수정
+        //let indexPath = NSIndexPath(forItem: 0, inSection: 0)
+        //let firstCell = self.tableView.cellForRowAtIndexPath(indexPath) as! DetailFirstCell
+        //firstCell.textView.delegate = self
     }
     
     override func didReceiveMemoryWarning() {
@@ -100,10 +103,17 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             cell.article = article
             //print(article)
             //cell.authorNick = article[""]
-            cell.authorNick = article["authorNick"] as? String
+            //cell.authorNick = article["authorNick"] as? String
             cell.postId = self.postId
             cell.separatorInset = UIEdgeInsetsMake(0.0, 10000, 0.0, cell.bounds.size.width)
-            cell.authorNick = self.name
+            
+            //print("name is \(self.name)")
+            //print("author Nick is \(self.myName)")
+            cell.authorNick = self.myName!
+            //cell.authorNick = self.name
+            //cell.authorNick = ""
+            
+            
             
             /*
             let nowPost = article
@@ -139,7 +149,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
                     (user: PFObject?, error: NSError?) -> Void in
                     if let nowPhoto = user?["userPhoto"]{
                         let unwrapPhoto = nowPhoto as! PFFile
-                        cell.userImage.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!, placeholderImage: nil)
+                        cell.userImage.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!)
                     }
                     else{
                         cell.userImage.image = UIImage(named: "default-user2")
@@ -206,9 +216,8 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
              */
             if let image = article["image"]{
                 let unwrapPhoto = image as! PFFile
-                cell.userPhoto!.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!, completionHandler:{(image, error, cacheType, imageURL) -> () in
-                    //print(unwrapPhoto.url)
-                    //print("이미지셋")
+                cell.userPhoto!.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!, placeholderImage: UIImage(named: "placeholderImage") ,completionHandler:{(image, error, cacheType, imageURL) -> () in
+                    
                 })
             }else{
                 //cell.imageConstraint.active = false
@@ -221,7 +230,7 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
             nowUser.fetchIfNeededInBackgroundWithBlock {
                 (user: PFObject?, error: NSError?) -> Void in
                 if let nowPhoto = user?["userPhoto"]{
-                    let unwrapPhoto = nowPhoto as! PFFile
+                    _ = nowPhoto as! PFFile
                     //print(unwrapPhoto.url)
                     //cell.userImage.kf_setImageWithURL(NSURL(string: unwrapPhoto.url!)!)
                     
@@ -257,8 +266,8 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
     
     
     @IBAction func test(sender: AnyObject) {
-        let firstIndexPath = NSIndexPath(forItem: 0, inSection: 0)
-        let firstSection = self.tableView.cellForRowAtIndexPath(firstIndexPath)
+        //let firstIndexPath = NSIndexPath(forItem: 0, inSection: 0)
+        //let firstSection = self.tableView.cellForRowAtIndexPath(firstIndexPath)
         //print(firstSection)
     }
     
@@ -266,13 +275,15 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         // Try to reuse the existing ‘pisa’ annotation image, if it exists
         var annotationImage = mapView.dequeueReusableAnnotationImageWithIdentifier("pin")
         
-        let thisCategory = self.category
+        //let thisCategory = self.category
         
         //print(thisCategory)
         
         if annotationImage == nil {
             // Leaning Tower of Pisa by Stefan Spieler from the Noun Project
             var image:UIImage!
+            
+            
             
             switch self.category {
             case "missing":
@@ -310,6 +321,26 @@ class DetailViewController: UIViewController, UITableViewDataSource, UITableView
         return annotationImage
     }
  
+    @IBAction func deleteAction(sender: AnyObject) {
+        let alertView = SCLAlertView()
+        alertView.addButton("삭제하기", action: {
+            let query = PFQuery(className:"article")
+            query.getObjectInBackgroundWithId(self.article.objectId!) {
+                (thisArticle: PFObject?, error: NSError?) -> Void in
+                if error != nil {
+                    print(error)
+                } else if let thisArticle = thisArticle {
+                    thisArticle.deleteInBackground()
+                    self.dismissViewControllerAnimated(true, completion: {});
+                }
+            }
+        })
+        alertView.addButton("취소") {
+            print("취소")
+        }
+        alertView.showCloseButton = false
+        alertView.showError("삭제하기", subTitle: "삭제하시겠습니까?")
+    }
     
 
     

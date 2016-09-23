@@ -76,6 +76,10 @@ class DetailSecondCell: UITableViewCell {
                                 alarmObject["toUser"] = self.article["user"]
                                 alarmObject["read"] = false
                                 alarmObject["article"] = self.article
+                                
+                                
+                                //알람마다 카테고리
+                                
                                 alarmObject["category"] = 0
                                 alarmObject.saveInBackgroundWithBlock{
                                     (successed: Bool, error: NSError?) -> Void in

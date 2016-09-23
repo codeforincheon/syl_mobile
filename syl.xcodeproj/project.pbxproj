@@ -25,8 +25,6 @@
 		BC310AFD1CC080500052292E /* AlamViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC310AFC1CC080500052292E /* AlamViewController.swift */; };
 		BC310AFF1CC080720052292E /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC310AFE1CC080720052292E /* SettingViewController.swift */; };
 		BC310B031CC08B5C0052292E /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC310B021CC08B5C0052292E /* SignUpViewController.swift */; };
-		BC310B051CC095320052292E /* ImagePicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC310B041CC095320052292E /* ImagePicker.framework */; };
-		BC310B061CC095E70052292E /* ImagePicker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BC310B041CC095320052292E /* ImagePicker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BC35A7AB1CBD191800E19556 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC35A7AA1CBD191800E19556 /* Bolts.framework */; };
 		BC4973AE1CBFA55400B15F5E /* KCFABManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC4973A81CBFA55400B15F5E /* KCFABManager.swift */; };
 		BC4973AF1CBFA55400B15F5E /* KCFABViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC4973A91CBFA55400B15F5E /* KCFABViewController.swift */; };
@@ -48,6 +46,8 @@
 		BC5BAA471CBD30DA0044F5EB /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5BAA461CBD30DA0044F5EB /* MapViewController.swift */; };
 		BC5FC0641CCA627300251555 /* AlarmCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5FC0631CCA627300251555 /* AlarmCell.swift */; };
 		BC5FC0671CCB033E00251555 /* badge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5FC0661CCB033E00251555 /* badge.swift */; };
+		BC8681451D14997E00AF2B95 /* ImagePicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC310B041CC095320052292E /* ImagePicker.framework */; };
+		BC8681471D14999F00AF2B95 /* ImagePicker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BC310B041CC095320052292E /* ImagePicker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BC933C731CBE0912001586D7 /* FoldingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC933C721CBE0912001586D7 /* FoldingCell.swift */; };
 		BC933C761CBE0FBE001586D7 /* ArticleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC933C751CBE0FBE001586D7 /* ArticleCell.swift */; };
 		BCA26D4B1CC0C4770087F0AF /* SCLAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCA26D4A1CC0C4770087F0AF /* SCLAlertView.swift */; };
@@ -98,8 +98,8 @@
 			files = (
 				BCF30D231CC9D94E00AB5918 /* SwiftDate.framework in Embed Frameworks */,
 				BCE362D11CC24D25008E6D20 /* Kingfisher.framework in Embed Frameworks */,
+				BC8681471D14999F00AF2B95 /* ImagePicker.framework in Embed Frameworks */,
 				BCE362CE1CC1F0EF008E6D20 /* Toucan.framework in Embed Frameworks */,
-				BC310B061CC095E70052292E /* ImagePicker.framework in Embed Frameworks */,
 				BC0AA4941CBEBC6B00E7A492 /* XCGLogger.framework in Embed Frameworks */,
 				BC5BAA3C1CBD1EB00044F5EB /* SwiftyJSON.framework in Embed Frameworks */,
 				BC5BAA351CBD1E7B0044F5EB /* Parse.framework in Embed Frameworks */,
@@ -166,10 +166,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC8681451D14997E00AF2B95 /* ImagePicker.framework in Frameworks */,
 				BCF30D221CC9D93900AB5918 /* SwiftDate.framework in Frameworks */,
 				BCE362D01CC24D01008E6D20 /* Kingfisher.framework in Frameworks */,
 				BCE362CD1CC1F0DB008E6D20 /* Toucan.framework in Frameworks */,
-				BC310B051CC095320052292E /* ImagePicker.framework in Frameworks */,
 				BC0AA4931CBEBC4F00E7A492 /* XCGLogger.framework in Frameworks */,
 				BC5BAA3B1CBD1EB00044F5EB /* SwiftyJSON.framework in Frameworks */,
 				BC1D80FA1CBD17310039DBE4 /* Parse.framework in Frameworks */,
@@ -475,10 +475,10 @@
 				"$(SRCROOT)/Carthage/Build/IOS/SwiftyJSON.framework",
 				"$(SRCROOT)/Carthage/Build/IOS/Bolts.framework",
 				"$(SRCROOT)/Carthage/Build/IOS/XCGLogger.framework",
-				"$(SRCROOT)/Carthage/Build/IOS/ImagePicker.framework",
 				"$(SRCROOT)/Carthage/Build/IOS/Toucan.framework",
 				"$(SRCROOT)/Carthage/Build/IOS/Kingfisher.framework",
 				"$(SRCROOT)/Carthage/Build/IOS/SwiftDate.framework",
+				"$(SRCROOT)/Carthage/Build/IOS/ImagePicker.framework",
 			);
 			outputPaths = (
 			);
@@ -666,6 +666,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = syl/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.timeros.syl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -686,6 +687,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = syl/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.timeros.syl;
 				PRODUCT_NAME = "$(TARGET_NAME)";

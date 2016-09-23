@@ -29,11 +29,11 @@ class DetailFirstCell: UITableViewCell {
     @IBAction func collapseAction(sender: AnyObject) {
         print("버튼 클릭")
         
-        if self.collapseBtnConstraint.constant == 239{
+        if self.collapseBtnConstraint.constant == 339{
             UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
                 self.mapView.alpha = 0
                 //self.mapHeightConstraint.active = false
-                self.collapseBtnConstraint.constant = 74
+                self.collapseBtnConstraint.constant = 72
                 self.mapHeightConstraint.constant = 0
                 //부모테이블
                 /*
@@ -53,8 +53,8 @@ class DetailFirstCell: UITableViewCell {
         else{
             UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
                 self.mapView.alpha = 1
-                self.collapseBtnConstraint.constant = 239
-                self.mapHeightConstraint.constant = 190
+                self.collapseBtnConstraint.constant = 339
+                self.mapHeightConstraint.constant = 290
                 //self.imageTopConstraint.constant = 196
                 
                 //부모테이블

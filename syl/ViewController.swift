@@ -41,12 +41,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBOutlet weak var collapseBtnConstraint: NSLayoutConstraint!
     @IBOutlet var floatBtnConstraint: NSLayoutConstraint!
     @IBOutlet var floatBtnConstraintBottom: NSLayoutConstraint!
+    @IBOutlet weak var activityIndc: UIActivityIndicatorView!
     
     //KFloat Button 맵, 아티클, 뱃지, 마커
     var map:MGLMapView!
     var article:[PFObject]!
     var badgeNum:Int!
     var markers:[MGLPointAnnotation] = []
+    var myName:String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,6 +65,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         map.attributionButton.hidden = true
         self.MapView.addSubview(map)
         map.delegate = self
+        //self.myName = "아트나비"
         
         //KFloat Button Add Item
         self.floatBtn.openAnimationType = KCFABOpenAnimationType.SlideDown
@@ -84,6 +87,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         //글쓰기 버튼 이미지
         self.floatBtn.buttonImage = UIImage(named: "write_btn")
+        
+        
     }
     
     
@@ -97,12 +102,24 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 [unowned self] in
                     self.performSegueWithIdentifier("FromMainToSign", sender: self)
             }
-            print("노아이디")
         }
         else{ //회원가입 했으면 유져트래킹모드
             map!.userTrackingMode = MGLUserTrackingMode.FollowWithHeading
             //테이블뷰 갱신
+            self.activityIndc.hidden = false
+            self.activityIndc.startAnimating()
             self.reloadData()
+            let nowUser = PFUser.currentUser()! as PFUser
+            nowUser.fetchIfNeededInBackgroundWithBlock {
+                (user: PFObject?, error: NSError?) -> Void in
+                print(user)
+                if let nickname = user?["nickname"]{
+                    self.myName = nickname as? String
+                    print("내이름\(self.myName)")
+                }else{
+                    print("아이디 가져오기 에러error")
+                }
+            }
         }
     }
     
@@ -136,13 +153,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         if segue.identifier == "FromMainToDetail"{ //메인 -> 디테일 segue
             let destController = segue.destinationViewController as! DetailViewController
             destController.article = self.article[sender!.row]
-            print(self.article[sender!.row]["authorNick"])
+            //print(self.article[sender!.row]["authorNick"])
             
             
             destController.nameArticle = (self.article[sender!.row]["authorNick"] as? String)! + "님의 글"
             destController.name = self.article[sender!.row]["authorNick"] as? String
-
             
+            destController.myName = self.myName
+            
+            
+ 
+            
+
             let query = PFQuery(className: "comment")
             query.whereKey("article", equalTo: self.article[sender!.row])
             query.orderByAscending("createdAt")
@@ -162,6 +184,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         if segue.identifier == "FromMainToAlarm"{ //메인 -> 알람 segue
             let destController = segue.destinationViewController as! AlamViewController
+            destController.myName = self.myName
             let query = PFQuery(className: "alarm")
             query.whereKey("toUser", equalTo: PFUser.currentUser()!)
             query.orderByDescending("createdAt")
@@ -171,13 +194,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     SCLAlertView().showError("Comment Error", subTitle: "알람 가져오기 에러 \(error)")
                 }
                 else{
-                    print("알람 가져왔다 \(objects)")
+                    //print("알람 가져왔다 \(objects)")
                     destController.alarms = objects!
                     
                     let section = NSIndexSet(index: 0)
                     destController.tableView.reloadSections(section, withRowAnimation: .Automatic)
                 }
             }
+            
         }
     }
 
@@ -222,11 +246,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         cell.foregroundName.text = article[indexPath.row]["authorNick"] as? String
         cell.backgroundColor = UIColor(red: 44/255, green: 43/255, blue: 43/255, alpha: 1)
         cell.foregroundContent.delegate = self
-        cell.foregroundContent.text = article[indexPath.row]["content"] as! String
+        
+        let style = NSMutableParagraphStyle()
+        style.lineSpacing = 10
+        let attributes = [NSParagraphStyleAttributeName : style]
+        let contentText:String = article[indexPath.row]["content"] as! String
+        cell.foregroundContent.attributedText = NSAttributedString(string: contentText, attributes:attributes)
+        cell.foregroundContent.textColor = UIColor.whiteColor()
+        cell.foregroundContent.font = UIFont(name: "HelveticaNeue", size: 17.0)
+        
         cell.shareCount.text = String(article[indexPath.row]["shareCount"] as! Int)
         cell.commentCount.text = String(article[indexPath.row]["commentCount"] as! Int)
-        cell.foregroundContent.text = article[indexPath.row]["content"] as! String
-        cell.foregroundContent.textColor = UIColor.whiteColor()
+        
         cell.foregroundTime.text = String(stringDate+" 전")
         cell.foregroundAddress.text = String(article[indexPath.row]["locationString"] as! String)
         
@@ -261,7 +292,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBAction func collapseAction(sender: AnyObject) {
         
         //열려있으면 접기
-        if(collapsibleConstraint.constant == 215)
+        if(collapsibleConstraint.constant == 315)
         {
             UIView.animateWithDuration(0.3, delay: 0, options: .CurveEaseIn, animations: {
                 self.myLocationBtn.alpha = 0
@@ -270,9 +301,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 //self.MapView.alpha = 0
                 self.MapView.alpha = 1
                 
-                print(self.collapseBtnConstraint.constant)
+                //print(self.collapseBtnConstraint.constant)
+                self.collapseBtnConstraint.constant = 67 //탑과 버튼사이
                 self.collapsibleConstraint.constant = 8
-                self.collapseBtnConstraint.constant = 69 //탑과 버튼사이
                 self.collapseBtn.hidden = true
                 //self.collapseBtn.transform = CGAffineTransformMakeRotation(CGFloat(M_PI))
                 self.view.layoutIfNeeded()}, completion: {
@@ -292,9 +323,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 self.floatBtnConstraint.active = true
                 self.myLocationBtn.alpha = 1
                 self.MapView.alpha = 1
-                self.collapsibleConstraint.constant = 215
                 self.collapseBtn.hidden = true
-                self.collapseBtnConstraint.constant = 259
+                self.collapseBtnConstraint.constant = 357
+                self.collapsibleConstraint.constant = 315
                 //self.collapseBtn.transform = CGAffineTransformMakeRotation(CGFloat(M_PI*2))
                 
                 self.view.layoutIfNeeded()}, completion: {
@@ -323,15 +354,30 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             let existingObject = self.article[sender!.tag]
             let newObject = PFObject(className: "article")
             
-            //print(existingObject)
+            print(existingObject)
             
+            
+            
+            //기존
             newObject["user"] = PFUser.currentUser()
             newObject["content"] = existingObject["content"]
+            newObject["authorNick"] = self.myName
+            newObject["authorId"] = PFUser.currentUser()?.objectId!
             
             newObject["location"] = existingObject["location"]
             
             if let image = existingObject["image"]{
+                newObject["numOfPhotos"] = 1
                 newObject["image"] = image
+                
+                let postPhotoObject = PFObject(className: "PostPhoto")
+                let nowData = NSDate().toString()!
+                newObject["photoKey"] = nowData
+                postPhotoObject["key"] = nowData
+                postPhotoObject["photoFile"] = image
+                postPhotoObject.saveInBackground()
+            }else{
+                newObject["numOfPhotos"] = 0
             }
             
             //newObject["shareCount"] = existingObject["shareCount"] as! Int + 1
@@ -343,6 +389,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             newObject.saveInBackgroundWithBlock({
                 (succeeded: Bool, error: NSError?) -> Void in
                 if succeeded == true{
+
                     let succesView = SCLAlertView()
                     succesView.showCloseButton = false
                     succesView.addButton("확인", action: {})
@@ -413,9 +460,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.map.deselectAnnotation(annotation, animated: false)
         
         //자주 에러남
-        let titleInt:Int = Int(annotation.title!!)!
-        let indexPath = NSIndexPath(forItem: titleInt, inSection: 0)
-        performSegueWithIdentifier("FromMainToDetail", sender: indexPath)
+        
+        if let titleInt:Int = Int(annotation.title!!){
+            let indexPath = NSIndexPath(forItem: titleInt, inSection: 0)
+            performSegueWithIdentifier("FromMainToDetail", sender: indexPath)
+        }
+        
         
     }
     
@@ -425,7 +475,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.article = []
         self.tableView.dataSource = self
         self.tableView.delegate = self
-        self.tableView.reloadData()
+        //self.tableView.reloadData()
         
         var query = PFQuery(className: "article")
         query.orderByDescending("createdAt")
@@ -436,30 +486,35 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
             else{
                 print("정보 가져옴")
+                print(objects!)
                 
-                self.article = objects!
-                self.tableView.dataSource = self
-                self.tableView.delegate = self
-                self.tableView.reloadData()
-                //let firstIdx = NSIndexSet(index: 0)
-                //self.tableView.reloadSections(firstIdx, withRowAnimation: .Automatic)
-                self.tableView.tableFooterView = UIView()
-                //애닌메이션 없음
-                //self.tableView.reloadData()
-                self.markers.removeAll()
-                if self.article.count != 0{
-                    for i in 0...self.article.count-1{
-                        //let
-                        let pfPoint = self.article[i]["location"] as! PFGeoPoint
-                        let cllocation = CLLocationCoordinate2D(latitude: pfPoint.latitude, longitude: pfPoint.longitude)
-                        let point = MGLPointAnnotation()
-                        point.coordinate = cllocation
-                        //point.performSelector(#selector(self.moveToDetail(_:)))
-                        point.title = String(i)
-                        point.subtitle = "Welcome to my marker"
-                        
-                        self.markers.append(point)
-                        self.map?.addAnnotation(point)
+                if self.article != objects!{
+                    self.article = objects!
+                    self.tableView.dataSource = self
+                    self.tableView.delegate = self
+                    self.tableView.reloadData()
+                    self.activityIndc.hidden = true
+                    self.activityIndc.stopAnimating()
+                    //let firstIdx = NSIndexSet(index: 0)
+                    //self.tableView.reloadSections(firstIdx, withRowAnimation: .Automatic)
+                    self.tableView.tableFooterView = UIView()
+                    //애닌메이션 없음
+                    //self.tableView.reloadData()
+                    self.markers.removeAll()
+                    if self.article.count != 0{
+                        for i in 0...self.article.count-1{
+                            //let
+                            let pfPoint = self.article[i]["location"] as! PFGeoPoint
+                            let cllocation = CLLocationCoordinate2D(latitude: pfPoint.latitude, longitude: pfPoint.longitude)
+                            let point = MGLPointAnnotation()
+                            point.coordinate = cllocation
+                            //point.performSelector(#selector(self.moveToDetail(_:)))
+                            point.title = String(i)
+                            point.subtitle = "Welcome to my marker"
+                            
+                            self.markers.append(point)
+                            self.map?.addAnnotation(point)
+                        }
                     }
                 }
             }
